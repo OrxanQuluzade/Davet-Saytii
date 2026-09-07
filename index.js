@@ -1,374 +1,201 @@
-/* =========================================
-   EMAILJS CONFIGURATION
-========================================= */
-const EMAILJS_PUBLIC_KEY = "U4M_W0iXRCPd7lXqD";
-const EMAILJS_SERVICE_ID = "service_ew9gjz1";
-const EMAILJS_TEMPLATE_ID = "template_g5kwrzq";
-const FEEDBACK_TEMPLATE_ID = "template_2emas1m";
+let guestName = "keci";
 
-/* Sizə aid e-poçt ünvanı */
-const TARGET_EMAIL = "orxnquluzada@gmail.com";
-
-/* =========================================
-   INITIALIZE EMAILJS SAFELY
-========================================= */
-(function initEmailJS() {
-    if (typeof emailjs !== "undefined") {
-        emailjs.init(EMAILJS_PUBLIC_KEY);
-    } else {
-        console.warn("EmailJS SDK yüklənmədi.");
+const categories = [
+    {
+        id: "food",
+        title: "🍕 Yemək / Məkan",
+        options: ["Qəhvə & Desert", "Pizza & Burger", "Romantik Şam Yeməyi", "Şərq Mətbəxi", "Piknik"]
+    },
+    {
+        id: "activity",
+        title: "🎬 Əyləncə & Fəaliyyət",
+        options: ["Kino / Teatr", "Parkda Gəzinti", "Bouling / Kartinq", "Muzey / Sərgi", "Karaoke"]
+    },
+    {
+        id: "time",
+        title: "⏰ Vaxt Seçimi",
+        options: ["Səhər (10:00 - 13:00)", "Günorta (14:00 - 17:00)", "Axşam (18:00 - 21:00)"]
     }
-})();
+];
 
-/* =========================================
-   DOM ELEMENTS
-========================================= */
-const nextNameBtn = document.getElementById("nextNameBtn");
-const yesBtn = document.getElementById("yesBtn");
-const noBtn = document.getElementById("noBtn");
-const submitBtn = document.getElementById("submitBtn");
-const feedbackBtn = document.getElementById("feedbackBtn");
+let selectedOptions = {};
 
-/* =========================================
-   ROUTING ON INITIAL LOAD (DIRECT TO STEP 1)
-========================================= */
-window.addEventListener("DOMContentLoaded", () => {
-    showStep("step1");
+document.addEventListener("DOMContentLoaded", () => {
+    const bgMusic = document.getElementById("bgMusic");
+    const musicToggleBtn = document.getElementById("musicToggleBtn");
+    const startBtn = document.getElementById("startBtn");
+    const nameInput = document.getElementById("nameInput");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const aiSuggestBtn = document.getElementById("aiSuggestBtn");
+    const finishPlanBtn = document.getElementById("finishPlanBtn");
+    const restartBtn2 = document.getElementById("restartBtn2");
+
+    function playAudio() {
+        if (bgMusic && bgMusic.paused) {
+            bgMusic.play().then(() => {
+                if (musicToggleBtn) musicToggleBtn.textContent = "🎵";
+            }).catch(err => console.log("Audio gözləyir:", err));
+        }
+    }
+
+    if (musicToggleBtn && bgMusic) {
+        musicToggleBtn.addEventListener("click", () => {
+            if (bgMusic.paused) {
+                playAudio();
+            } else {
+                bgMusic.pause();
+                musicToggleBtn.textContent = "🔇";
+            }
+        });
+    }
+
+    if (startBtn) {
+        startBtn.addEventListener("click", () => {
+            playAudio();
+            const val = nameInput.value.trim();
+            if (val) guestName = val;
+            
+            const greetingTitle = document.getElementById("greetingTitle");
+            if (greetingTitle) {
+                greetingTitle.textContent = `Salam ${guestName}! 😍`;
+            }
+            showStep("step2");
+        });
+    }
+
+    if (yesBtn) {
+        yesBtn.addEventListener("click", () => {
+            renderCategories();
+            showStep("step3");
+        });
+    }
+
+    if (noBtn) {
+        noBtn.addEventListener("mouseover", () => {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40);
+            noBtn.style.position = "fixed";
+            noBtn.style.left = `${Math.max(10, x)}px`;
+            noBtn.style.top = `${Math.max(10, y)}px`;
+        });
+
+        noBtn.addEventListener("click", () => {
+            showStep("stepDecline");
+        });
+    }
+
+    if (aiSuggestBtn) {
+        aiSuggestBtn.addEventListener("click", () => {
+            const aiBox = document.getElementById("aiSuggestionBox");
+            const suggestions = [
+                "💡 AI Tövsiyəsi: Rahat bir kofedə başlayıb, sonra parkda gəzintiyə çıxmaq əla olar!",
+                "💡 AI Tövsiyəsi: Birlikdə dadlı pizza yeyib ardınca maraqlı bir film izləyə bilərsiniz! 🍕🎬",
+                "💡 AI Tövsiyəsi: Axşamüstü gəzinti və ardınca şirin desertlər günü unudulmaz edəcək! 🍰✨"
+            ];
+            const randomSuggest = suggestions[Math.floor(Math.random() * suggestions.length)];
+            if (aiBox) {
+                aiBox.textContent = randomSuggest;
+                aiBox.style.display = "block";
+            }
+        });
+    }
+
+    // Planı tamamlayanda gizli inputları doldururuq ki, Formspree birbaşa mailə göndərsin
+    const dateForm = document.getElementById("dateForm");
+    if (dateForm) {
+        dateForm.addEventListener("submit", (e) => {
+            document.getElementById("inputGuestName").value = guestName;
+            document.getElementById("inputPlanSummary").value = getSummaryPlain();
+            document.getElementById("inputAiSuggestion").value = document.getElementById("aiSuggestionBox")?.textContent || "Seçilmədi";
+            if (window.confetti) confetti();
+        });
+    }
+
+    if (restartBtn2) restartBtn2.addEventListener("click", resetAll);
+
+    function resetAll() {
+        selectedOptions = {};
+        document.getElementById("liveSummary").innerHTML = "";
+        document.getElementById("aiSuggestionBox").style.display = "none";
+        document.getElementById("nameInput").value = "";
+        guestName = "Qonaq";
+        showStep("step1");
+    }
 });
 
-/* =========================================
-   EVENT LISTENERS
-========================================= */
-if (nextNameBtn) nextNameBtn.addEventListener("click", submitName);
+function showStep(stepId) {
+    document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+    const target = document.getElementById(stepId);
+    if (target) target.classList.add("active");
+}
 
-if (yesBtn) {
-    yesBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        nextStep(3);
+function renderCategories() {
+    const container = document.getElementById("categoriesContainer");
+    if (!container) return;
+    container.innerHTML = "";
+
+    categories.forEach(cat => {
+        const catDiv = document.createElement("div");
+        catDiv.className = "category-block";
+
+        const title = document.createElement("h3");
+        title.textContent = cat.title;
+        catDiv.appendChild(title);
+
+        const optionsDiv = document.createElement("div");
+        optionsDiv.className = "options-grid";
+
+        cat.options.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "option-btn";
+            btn.textContent = opt;
+
+            if (selectedOptions[cat.id] === opt) {
+                btn.classList.add("selected");
+            }
+
+            btn.addEventListener("click", () => {
+                if (selectedOptions[cat.id] === opt) {
+                    delete selectedOptions[cat.id];
+                } else {
+                    selectedOptions[cat.id] = opt;
+                }
+                renderCategories();
+                updateLiveSummary();
+            });
+
+            optionsDiv.appendChild(btn);
+        });
+
+        catDiv.appendChild(optionsDiv);
+        container.appendChild(catDiv);
     });
 }
 
-if (submitBtn) submitBtn.addEventListener("click", finishSelection);
-if (feedbackBtn) feedbackBtn.addEventListener("click", sendFeedback);
-
-/* =========================================
-   STEP NAVIGATION
-========================================= */
-function showStep(stepId) {
-    const steps = document.querySelectorAll(".step");
-    steps.forEach(step => step.classList.remove("active"));
-
-    const targetStep = document.getElementById(stepId);
-    if (targetStep) targetStep.classList.add("active");
+function updateLiveSummary() {
+    const box = document.getElementById("liveSummary");
+    if (!box) return;
+    box.innerHTML = buildSummaryHtml() || "<p>Hələ heç nə seçilməyib.</p>";
 }
 
-function nextStep(stepNumber) {
-    showStep(`step${stepNumber}`);
-}
-
-/* =========================================
-   STEP 1: NAME VALIDATION
-========================================= */
-function submitName(event) {
-    if (event) event.preventDefault();
-
-    const nameInput = document
-        .getElementById("userName")
-        .value
-        .trim();
-
-    if (!nameInput) {
-        alert("Zəhmət olmasa əvvəlcə adınızı daxil edin!");
-        return;
-    }
-
-    const askNameEl = document.getElementById("askName");
-    const displayNameEl = document.getElementById("displayName");
-
-    if (askNameEl) askNameEl.textContent = nameInput;
-    if (displayNameEl) displayNameEl.textContent = nameInput;
-
-    nextStep(2);
-}
-
-/* =========================================
-   NO BUTTON DODGE SYSTEM
-========================================= */
-function rectRelativeTo(element, containerRect) {
-    const rect = element.getBoundingClientRect();
-
-    return {
-        left: rect.left - containerRect.left,
-        top: rect.top - containerRect.top,
-        width: rect.width,
-        height: rect.height
-    };
-}
-
-let noBtnBusy = false;
-
-function dodgeNoButton(event) {
-    if (event) {
-        event.preventDefault();
-    }
-
-    if (noBtnBusy || !noBtn || !yesBtn) {
-        return;
-    }
-
-    noBtnBusy = true;
-
-    const container = document.querySelector("#step2 .btn-container");
-    if (!container) return;
-
-    const containerRect = container.getBoundingClientRect();
-
-    if (!noBtn.classList.contains("dodging")) {
-        const noRect = rectRelativeTo(noBtn, containerRect);
-
-        noBtn.style.left = `${noRect.left}px`;
-        noBtn.style.top = `${noRect.top}px`;
-        noBtn.classList.add("dodging");
-    }
-
-    const yesRect = rectRelativeTo(yesBtn, containerRect);
-    const buttonWidth = noBtn.offsetWidth;
-    const buttonHeight = noBtn.offsetHeight;
-    const padding = 10;
-
-    const maxX = Math.max(containerRect.width - buttonWidth, 0);
-    const maxY = Math.max(containerRect.height - buttonHeight, 0);
-
-    let newLeft;
-    let newTop;
-    let tries = 0;
-
-    function overlapsYes(left, top) {
-        return (
-            left < yesRect.left + yesRect.width + padding &&
-            left + buttonWidth > yesRect.left - padding &&
-            top < yesRect.top + yesRect.height + padding &&
-            top + buttonHeight > yesRect.top - padding
-        );
-    }
-
-    do {
-        newLeft = Math.random() * maxX;
-        newTop = Math.random() * maxY;
-        tries++;
-    } while (overlapsYes(newLeft, newTop) && tries < 12);
-
-    noBtn.style.left = `${newLeft}px`;
-    noBtn.style.top = `${newTop}px`;
-
-    noBtn.style.pointerEvents = "none";
-
-    setTimeout(() => {
-        if (noBtn) noBtn.style.pointerEvents = "";
-    }, 150);
-
-    noBtn.classList.remove("dodge-pulse");
-    void noBtn.offsetWidth;
-    noBtn.classList.add("dodge-pulse");
-
-    setTimeout(() => {
-        noBtnBusy = false;
-    }, 60);
-}
-
-if (noBtn) {
-    noBtn.addEventListener("pointerdown", dodgeNoButton, { passive: false });
-    noBtn.addEventListener("mouseenter", dodgeNoButton);
-}
-
-window.addEventListener("resize", () => {
-    if (!noBtn || !noBtn.classList.contains("dodging")) {
-        return;
-    }
-
-    const container = document.querySelector("#step2 .btn-container");
-    if (!container) return;
-
-    const containerRect = container.getBoundingClientRect();
-
-    const maxX = Math.max(containerRect.width - noBtn.offsetWidth, 0);
-    const maxY = Math.max(containerRect.height - noBtn.offsetHeight, 0);
-
-    const currentLeft = parseFloat(noBtn.style.left) || 0;
-    const currentTop = parseFloat(noBtn.style.top) || 0;
-
-    noBtn.style.left = `${Math.min(currentLeft, maxX)}px`;
-    noBtn.style.top = `${Math.min(currentTop, maxY)}px`;
-});
-
-/* =========================================
-   FINAL DATE SUBMISSION
-========================================= */
-async function finishSelection(event) {
-    if (event) event.preventDefault();
-
-    const name = document.getElementById("userName").value.trim();
-    const date = document.getElementById("datePicker").value;
-    const time = document.getElementById("timePicker").value;
-    const selectedPlace = document.querySelector('input[name="place"]:checked');
-    const customActivity = document.getElementById("customActivity").value.trim();
-
-    if (!date) {
-        alert("Zəhmət olmasa tarixi seçin!");
-        return;
-    }
-
-    if (!time) {
-        alert("Zəhmət olmasa saatı seçin!");
-        return;
-    }
-
-    if (!selectedPlace) {
-        alert("Zəhmət olmasa bir fəaliyyət seçin!");
-        return;
-    }
-
-    let activityChoice;
-    if (selectedPlace.value === "Other") {
-        if (!customActivity) {
-            alert("Zəhmət olmasa öz fəaliyyət ideyanızı qeyd edin!");
-            return;
+function buildSummaryHtml() {
+    let html = "";
+    categories.forEach(cat => {
+        if (selectedOptions[cat.id]) {
+            html += `<p><strong>${cat.title}:</strong> ${selectedOptions[cat.id]}</p>`;
         }
-        activityChoice = customActivity;
-    } else {
-        activityChoice = selectedPlace.value;
-    }
-
-    const finalNameEl = document.getElementById("finalName");
-    const summaryDateEl = document.getElementById("summaryDate");
-    const summaryTimeEl = document.getElementById("summaryTime");
-    const summaryPlaceEl = document.getElementById("summaryPlace");
-
-    if (finalNameEl) finalNameEl.textContent = name;
-    if (summaryDateEl) summaryDateEl.textContent = date;
-    if (summaryTimeEl) summaryTimeEl.textContent = time;
-    if (summaryPlaceEl) summaryPlaceEl.textContent = activityChoice;
-
-    const templateParams = {
-        target_email: TARGET_EMAIL,
-        user_name: name,
-        date: date,
-        time: time,
-        location: activityChoice,
-        activity: activityChoice
-    };
-
-    if (typeof emailjs !== "undefined") {
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Göndərilir... 💌";
-
-        try {
-            await emailjs.send(
-                EMAILJS_SERVICE_ID,
-                EMAILJS_TEMPLATE_ID,
-                templateParams
-            );
-            console.log(`Dəvət cavabı göndərildi: ${TARGET_EMAIL}`);
-        } catch (error) {
-            console.error("E-poçt göndərilmədi:", error);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Seçimimi Təsdiqlə ❤️";
-        }
-    }
-
-    nextStep(4);
-    celebrate();
+    });
+    return html;
 }
 
-/* =========================================
-   CONFETTI CELEBRATION
-========================================= */
-function celebrate() {
-    const confettiFunc = window.confetti || (typeof confetti !== "undefined" ? confetti : null);
-
-    if (!confettiFunc) {
-        return;
-    }
-
-    const duration = 3000;
-    const end = Date.now() + duration;
-
-    (function frame() {
-        confettiFunc({
-            particleCount: 6,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0 }
-        });
-
-        confettiFunc({
-            particleCount: 6,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1 }
-        });
-
-        if (Date.now() < end) {
-            requestAnimationFrame(frame);
+function getSummaryPlain() {
+    let text = "";
+    categories.forEach(cat => {
+        if (selectedOptions[cat.id]) {
+            text += `${cat.title}: ${selectedOptions[cat.id]} | `;
         }
-    })();
-}
-
-/* =========================================
-   SEND FEEDBACK
-========================================= */
-async function sendFeedback(event) {
-    if (event) event.preventDefault();
-
-    const feedbackName = document.getElementById("feedbackName").value.trim();
-    const feedbackMessage = document.getElementById("feedbackMessage").value.trim();
-    const statusDiv = document.getElementById("feedbackStatus");
-
-    if (!feedbackMessage) {
-        alert("Zəhmət olmasa əvvəlcə qeydinizi yazın!");
-        return;
-    }
-
-    const feedbackParams = {
-        name: feedbackName || "Anonim",
-        message: feedbackMessage
-    };
-
-    feedbackBtn.disabled = true;
-    feedbackBtn.textContent = "Göndərilir... 💌";
-    if (statusDiv) statusDiv.textContent = "";
-
-    try {
-        if (typeof emailjs !== "undefined") {
-            await emailjs.send(
-                EMAILJS_SERVICE_ID,
-                FEEDBACK_TEMPLATE_ID,
-                feedbackParams
-            );
-
-            if (statusDiv) {
-                statusDiv.style.color = "#d63384";
-                statusDiv.textContent = "Qeydiniz üçün təşəkkür edirəm! 💖";
-            } else {
-                alert("Qeydiniz üçün təşəkkür edirəm! 💖");
-            }
-
-            document.getElementById("feedbackName").value = "";
-            document.getElementById("feedbackMessage").value = "";
-        } else {
-            alert("EmailJS düzgün yüklənməyib.");
-        }
-    } catch (error) {
-        console.error("Feedback göndərilmədi:", error);
-        if (statusDiv) {
-            statusDiv.style.color = "red";
-            statusDiv.textContent = "Qeyd göndərilərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.";
-        } else {
-            alert("Qeyd göndərilərkən xəta baş verdi.");
-        }
-    } finally {
-        feedbackBtn.disabled = false;
-        feedbackBtn.textContent = "Qeydi Göndər 💌";
-    }
+    });
+    return text || "Heç nə seçilməyib";
 }
