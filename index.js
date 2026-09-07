@@ -1,18 +1,9 @@
 /* =========================================
-   EMAILJS KONFİQURASİYASI
+   FORMSPREE İLƏ MAİL GÖNDƏRMƏ
+   (Mailin çatacağı ünvan: orxnquluzada@gmail.com)
 ========================================= */
-const EMAILJS_PUBLIC_KEY = "U4M_W0iXRCPd7lXqD";
-const EMAILJS_SERVICE_ID = "service_ew9gjz1";
-const EMAILJS_TEMPLATE_ID = "template_g5kwrzq";
-const TARGET_EMAIL = "orxnquluzada@gmail.com";
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/orxnquluzada@gmail.com";
 
-if (typeof emailjs !== "undefined") {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-}
-
-/* =========================================
-   KATEQORİYALAR & SEÇİMLƏR
-========================================= */
 const categories = [
     {
         id: "food",
@@ -34,9 +25,6 @@ const categories = [
 let selectedOptions = {};
 let currentUserName = "";
 
-/* =========================================
-   ƏSAS MƏNTİQ
-========================================= */
 document.addEventListener("DOMContentLoaded", () => {
     const bgMusic = document.getElementById("bgMusic");
     const musicToggleBtn = document.getElementById("musicToggleBtn");
@@ -52,12 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const restartBtn = document.getElementById("restartBtn");
     const restartBtn2 = document.getElementById("restartBtn2");
 
-    // --- Musiqi Funksiyası ---
+    // Səs oxutmaq üçün funksiya
     function playAudio() {
         if (bgMusic && bgMusic.paused) {
             bgMusic.play().then(() => {
                 if (musicToggleBtn) musicToggleBtn.textContent = "🎵";
-            }).catch(err => console.log("Audio avtomatik icazə gözləyir:", err));
+            }).catch(err => console.log("Audio icazə gözləyir:", err));
         }
     }
 
@@ -72,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- Addım 1 ➔ Addım 2 (Adı almaq) ---
+    // Addım 1 ➔ Addım 2
     if (nextNameBtn) {
         nextNameBtn.addEventListener("click", () => {
             const val = userNameInput ? userNameInput.value.trim() : "";
@@ -88,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- Addım 2: Bəli / Xeyr ---
+    // Addım 2 (Bəli / Xeyr)
     if (yesBtn) {
         yesBtn.addEventListener("click", () => {
             playAudio();
@@ -98,7 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (noBtn) {
-        // "Xeyr" düyməsindən qaçmaq effekti
         noBtn.addEventListener("mouseover", () => {
             const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40);
             const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40);
@@ -112,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- AI Tövsiyəsi ---
+    // AI Tövsiyəsi
     if (aiSuggestBtn) {
         aiSuggestBtn.addEventListener("click", () => {
             const aiBox = document.getElementById("aiSuggestionBox");
@@ -129,12 +116,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- Addım 3 ➔ Addım 4 (Tamamlama və Mail Göndərmə) ---
+    // Addım 3 ➔ Addım 4 (Tamamlama və Mail Göndərmə)
     if (finishPlanBtn) {
         finishPlanBtn.addEventListener("click", async () => {
             const summaryText = buildSummaryText();
 
-            // Yekun interfeysi doldur
             const finalSummary = document.getElementById("finalSummary");
             if (finalSummary) {
                 finalSummary.innerHTML = `
@@ -143,30 +129,39 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
             }
 
-            const aiBoxContent = document.getElementById("aiSuggestionBox")?.textContent || "";
+            const aiBoxContent = document.getElementById("aiSuggestionBox")?.textContent || "Tövsiyə seçilmədi";
             const finalAiBox = document.getElementById("finalAiBox");
-            if (finalAiBox && aiBoxContent) {
+            if (finalAiBox && aiBoxContent !== "Tövsiyə seçilmədi") {
                 finalAiBox.textContent = aiBoxContent;
                 finalAiBox.style.display = "block";
             }
 
-            // Mail Göndər
             const sendStatus = document.getElementById("sendStatus");
             if (sendStatus) sendStatus.textContent = "Plan mailə göndərilir... ⏳";
 
-            if (typeof emailjs !== "undefined") {
-                try {
-                    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                        target_email: TARGET_EMAIL,
-                        user_name: currentUserName,
-                        plan_details: getSummaryPlain(),
-                        ai_suggestion: aiBoxContent
-                    });
+            // Formspree Vasitəsilə Mail Göndərilməsi
+            try {
+                const response = await fetch(FORMSPREE_ENDPOINT, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "Qonaq": currentUserName,
+                        "Seçilmiş Plan": getSummaryPlain(),
+                        "AI Tövsiyəsi": aiBoxContent
+                    })
+                });
+
+                if (response.ok) {
                     if (sendStatus) sendStatus.textContent = "Plan mailinə uğurla göndərildi! Səni səbirsizliklə gözləyirəm! 💘";
-                } catch (err) {
-                    console.error("Mail göndərilmədi:", err);
-                    if (sendStatus) sendStatus.textContent = "Plan qeydə alındı! (Mail göndərilərkən xəta oldu)";
+                } else {
+                    if (sendStatus) sendStatus.textContent = "Plan qeydə alındı! (Mail göndərmədə kiçik ləngimə oldu)";
                 }
+            } catch (err) {
+                console.error("Xəta:", err);
+                if (sendStatus) sendStatus.textContent = "Plan qeydə alındı!";
             }
 
             showStep("step4");
@@ -174,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- Yenidən Başla ---
     if (restartBtn) restartBtn.addEventListener("click", resetAll);
     if (restartBtn2) restartBtn2.addEventListener("click", resetAll);
 
@@ -188,9 +182,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-/* =========================================
-   KÖMƏKÇİ FUNKSİYALAR
-========================================= */
 function showStep(stepId) {
     document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
     const target = document.getElementById(stepId);
@@ -260,7 +251,7 @@ function getSummaryPlain() {
     let text = "";
     categories.forEach(cat => {
         if (selectedOptions[cat.id]) {
-            text += `${cat.title}: ${selectedOptions[cat.id]}\n`;
+            text += `${cat.title}: ${selectedOptions[cat.id]} | `;
         }
     });
     return text || "Heç nə seçilməyib";
