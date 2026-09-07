@@ -1,6 +1,5 @@
 /* =========================================
-   FORMSPREE İLƏ MAİL GÖNDƏRMƏ
-   (Mailin çatacağı ünvan: orxnquluzada@gmail.com)
+   KATEQORİYALAR & SEÇİMLƏR
 ========================================= */
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/orxnquluzada@gmail.com";
 
@@ -23,15 +22,11 @@ const categories = [
 ];
 
 let selectedOptions = {};
-let currentUserName = "";
+const guestName = "Nərmin xanım";
 
 document.addEventListener("DOMContentLoaded", () => {
     const bgMusic = document.getElementById("bgMusic");
     const musicToggleBtn = document.getElementById("musicToggleBtn");
-    
-    const userNameInput = document.getElementById("userName");
-    const nextNameBtn = document.getElementById("nextNameBtn");
-    const displayGuestName = document.getElementById("displayGuestName");
     
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
@@ -40,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const restartBtn = document.getElementById("restartBtn");
     const restartBtn2 = document.getElementById("restartBtn2");
 
-    // Səs oxutmaq üçün funksiya
+    // Səs oxutmaq
     function playAudio() {
         if (bgMusic && bgMusic.paused) {
             bgMusic.play().then(() => {
@@ -60,23 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Addım 1 ➔ Addım 2
-    if (nextNameBtn) {
-        nextNameBtn.addEventListener("click", () => {
-            const val = userNameInput ? userNameInput.value.trim() : "";
-            if (!val) {
-                alert("Zəhmət olmasa adınızı daxil edin!");
-                return;
-            }
-            currentUserName = val;
-            if (displayGuestName) displayGuestName.textContent = currentUserName;
-            
-            playAudio();
-            showStep("step2");
-        });
-    }
-
-    // Addım 2 (Bəli / Xeyr)
+    // Bəli düyməsi
     if (yesBtn) {
         yesBtn.addEventListener("click", () => {
             playAudio();
@@ -85,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Xeyr düyməsi (qaçan düymə)
     if (noBtn) {
         noBtn.addEventListener("mouseover", () => {
             const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40);
@@ -105,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const aiBox = document.getElementById("aiSuggestionBox");
             const suggestions = [
                 "💡 AI Tövsiyəsi: Rahat bir kofedə başlayıb, sonra parkda gəzintiyə çıxmaq əla olar!",
-                "💡 AI Tövsiyəsi: Birlikdə Dadlı pizza yeyib ardınca maraqlı bir film izləyə bilərsiniz! 🍕🎬",
+                "💡 AI Tövsiyəsi: Birlikdə dadlı pizza yeyib ardınca maraqlı bir film izləyə bilərsiniz! 🍕🎬",
                 "💡 AI Tövsiyəsi: Axşamüstü gəzinti və ardınca şirin desertlər günü unudulmaz edəcək! 🍰✨"
             ];
             const randomSuggest = suggestions[Math.floor(Math.random() * suggestions.length)];
@@ -116,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Addım 3 ➔ Addım 4 (Tamamlama və Mail Göndərmə)
+    // Planı Tamamla
     if (finishPlanBtn) {
         finishPlanBtn.addEventListener("click", async () => {
             const summaryText = buildSummaryText();
@@ -124,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const finalSummary = document.getElementById("finalSummary");
             if (finalSummary) {
                 finalSummary.innerHTML = `
-                    <p>👤 <strong>Qonaq:</strong> ${currentUserName}</p>
+                    <p>👤 <strong>Qonaq:</strong> ${guestName}</p>
                     ${summaryText}
                 `;
             }
@@ -139,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const sendStatus = document.getElementById("sendStatus");
             if (sendStatus) sendStatus.textContent = "Plan mailə göndərilir... ⏳";
 
-            // Formspree Vasitəsilə Mail Göndərilməsi
             try {
                 const response = await fetch(FORMSPREE_ENDPOINT, {
                     method: "POST",
@@ -148,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         "Accept": "application/json"
                     },
                     body: JSON.stringify({
-                        "Qonaq": currentUserName,
+                        "Qonaq": guestName,
                         "Seçilmiş Plan": getSummaryPlain(),
                         "AI Tövsiyəsi": aiBoxContent
                     })
@@ -157,11 +136,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (response.ok) {
                     if (sendStatus) sendStatus.textContent = "Plan mailinə uğurla göndərildi! Səni səbirsizliklə gözləyirəm! 💘";
                 } else {
-                    if (sendStatus) sendStatus.textContent = "Plan qeydə alındı! (Mail göndərmədə kiçik ləngimə oldu)";
+                    if (sendStatus) sendStatus.textContent = "Plan qeydə alındı! Səni səbirsizliklə gözləyirəm! 💘";
                 }
             } catch (err) {
-                console.error("Xəta:", err);
-                if (sendStatus) sendStatus.textContent = "Plan qeydə alındı!";
+                if (sendStatus) sendStatus.textContent = "Plan qeydə alındı! Səni səbirsizliklə gözləyirəm! 💘";
             }
 
             showStep("step4");
@@ -174,11 +152,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function resetAll() {
         selectedOptions = {};
-        currentUserName = "";
-        if (userNameInput) userNameInput.value = "";
         document.getElementById("liveSummary").innerHTML = "";
         document.getElementById("aiSuggestionBox").style.display = "none";
-        showStep("step1");
+        showStep("step2");
     }
 });
 
