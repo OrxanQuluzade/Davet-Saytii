@@ -3,67 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bizim Date Planımız 💕</title>
+    <title>Özəl Dəvət ❤️</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Canvas Confetti -->
+    <!-- Canvas Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
 
-    <!-- Musiqi Pleyeri -->
-    <audio id="bgMusic" loop src="pmml.mp3" preload="auto"></audio>
-    <button id="musicToggleBtn" class="music-btn" title="Musiqi">🎵</button>
-
-    <div class="container">
-        <!-- FORM: Birbaşa sənin mailinə göndərir -->
-        <form id="dateForm" action="https://formspree.io/f/orxnquluzada@gmail.com" method="POST" class="card">
-
-            <!-- Gizli inputlar: Seçimləri və AI mətnini mailə daşımaq üçün -->
-            <input type="hidden" name="Qonaq_Adi" id="inputGuestName">
-            <input type="hidden" name="Secilmis_Planlar" id="inputPlanSummary">
-            <input type="hidden" name="AI_Tovsiyesi" id="inputAiSuggestion">
-
-            <!-- ADDIM 1: Ad Girişi -->
-            <div class="step active" id="step1">
-                <h2>Xoş gəldin! 🌸</h2>
-                <p>Zəhmət olmasa adını daxil et:</p>
-                <input type="text" id="nameInput" placeholder="Adını yaz...">
-                <button type="button" id="startBtn" class="full-width-btn">Davam et ➔</button>
+    <div class="card">
+        <!-- STEP 1: NAME INPUT -->
+        <div id="step1" class="step active">
+            <h1>Xoş gəldiniz! ✨</h1>
+            <p>Sizə özəl bir sürprizim var. Zəhmət olmasa əvvəlcə adınızı daxil edin:</p>
+            <div class="field-group">
+                <input type="text" id="userName" placeholder="Adınız..." required>
             </div>
+            <button id="nextNameBtn" class="full-width-btn">Davam Et 💖</button>
+        </div>
 
-            <!-- ADDIM 2: Bəli / Xeyr Sualı -->
-            <div class="step" id="step2">
-                <h2 id="greetingTitle">Hellolardan bir demət! 😍</h2>
-                <p>Mənimlə çıxarsan?</p>
-                <div class="btn-container">
-                    <button type="button" id="yesBtn">Bəli, çıxaram! 💕</button>
-                    <button type="button" id="noBtn">Xeyr 😢</button>
+        <!-- STEP 2: THE QUESTION (YES/NO) -->
+        <div id="step2" class="step">
+            <h2>Salam, <span id="askName" class="highlight-name"></span>! 🌸</h2>
+            <p class="question-text">Mənimlə gözəl bir gün keçirməyə razısan? ☕✨</p>
+            
+            <div class="btn-container">
+                <button id="yesBtn">BƏLİ! ❤️</button>
+                <button id="noBtn">Xeyr 😢</button>
+            </div>
+        </div>
+
+        <!-- STEP 3: DATE & ACTIVITY SELECTION -->
+        <div id="step3" class="step">
+            <h2>Əla seçim! Mən də çox şadam 🥰</h2>
+            <p>Gəl planımızı birlikdə quraq:</p>
+
+            <form id="dateForm" onsubmit="return false;">
+                <div class="field-group">
+                    <label class="label-text" for="datePicker">Tarix seçin:</label>
+                    <input type="date" id="datePicker" required>
                 </div>
+
+                <div class="field-group">
+                    <label class="label-text" for="timePicker">Saat seçin:</label>
+                    <input type="time" id="timePicker" required>
+                </div>
+
+                <h3 class="activity-title">Nə etmək istərdiniz? 🎈</h3>
+                <div class="activity-options">
+                    <label class="activity-card">
+                        <input type="radio" name="place" value="Qəhvə & Şirniyyat" checked>
+                        <span>☕ Rahat bir kofedə görüşmək</span>
+                    </label>
+                    <label class="activity-card">
+                        <input type="radio" name="place" value="Nahar / Şam Yeməyi">
+                        <span>🍕 Birlikdə ləzzətli yemək yemək</span>
+                    </label>
+                    <label class="activity-card">
+                        <input type="radio" name="place" value="Gəzinti & Park">
+                        <span>🌳 Şəhərdə/Parkda gəzintiyə çıxmaq</span>
+                    </label>
+                    <label class="activity-card">
+                        <input type="radio" name="place" value="Kino / Teatr">
+                        <span>🎬 Birlikdə film izləmək</span>
+                    </label>
+                    <label class="activity-card">
+                        <input type="radio" name="place" value="Other">
+                        <span>✨ Başqa bir ideya (Aşağıda qeyd edin)</span>
+                    </label>
+                </div>
+
+                <div class="field-group" style="margin-top: 10px;">
+                    <input type="text" id="customActivity" placeholder="Öz fəaliyyət ideyanızı yazın...">
+                </div>
+
+                <button id="submitBtn" class="full-width-btn">Seçimimi Təsdiqlə ❤️</button>
+            </form>
+        </div>
+
+        <!-- STEP 4: THANK YOU & SUMMARY -->
+        <div id="step4" class="step">
+            <div class="thank-you-box">
+                <h2>Görüşənədək, <span id="finalName" class="highlight-name"></span>! 🎉</h2>
+                <p class="thank-you-text">Dəvətimi qəbul etdiyin üçün təşəkkür edirəm. Görüşümüzün təfərrüatları:</p>
+                
+                <div class="summary-box">
+                    <p>📅 <strong>Tarix:</strong> <span id="summaryDate"></span></p>
+                    <p>⏰ <strong>Saat:</strong> <span id="summaryTime"></span></p>
+                    <p>📍 <strong>Plan:</strong> <span id="summaryPlace"></span></p>
+                </div>
+
+                <p>Səni səbirsizliklə gözləyəcəyəm! ❤️</p>
             </div>
 
-            <!-- ADDIM 3: Plan Seçimi -->
-            <div class="step" id="step3">
-                <h2>Planımızı Quraq! 🗓️</h2>
-                <p style="font-size: 13px;">İstədiyin kateqoriyaya bas və seç:</p>
-
-                <div id="categoriesContainer"></div>
-                <div class="summary-box" id="liveSummary"></div>
-
-                <button type="button" id="aiSuggestBtn" class="secondary-btn full-width-btn">🤖 AI Tövsiyəsi Al</button>
-                <div class="ai-suggestion-box" id="aiSuggestionBox"></div>
-
-                <!-- SUBMIT DÜYMƏSİ: Formspree-ni işə salır və mail gəlir -->
-                <button type="submit" id="finishPlanBtn" class="full-width-btn">Planı Tamamla & Mail Göndər 🎉</button>
+            <!-- Optional Feedback -->
+            <div class="feedback-section">
+                <p class="small-text">Əlavə etmək istədiyin bir qeyd və ya sözün var?</p>
+                <input type="text" id="feedbackName" placeholder="Adınız (istəyə bağlı)">
+                <textarea id="feedbackMessage" placeholder="Mesajınız..."></textarea>
+                <button id="feedbackBtn" class="secondary-btn">Qeydi Göndər 💌</button>
+                <div id="feedbackStatus" class="feedback-status"></div>
             </div>
-
-            <!-- İMTİNA -->
-            <div class="step" id="stepDecline">
-                <h2>Çox təəssüf! 😢</h2>
-                <p>Fikrini dəyişsən, buradayam!</p>
-                <button type="button" id="restartBtn2" class="secondary-btn full-width-btn">Geri qayıt</button>
-            </div>
-
-        </form>
+        </div>
     </div>
 
     <script src="index.js"></script>
