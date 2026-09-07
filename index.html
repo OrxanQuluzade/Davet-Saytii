@@ -5,29 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bizim Date Planımız 💕</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Canvas Confetti (Konfeti effekti üçün) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- EmailJS SDK (Mail göndərmək üçün) -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
+
     <!-- Musiqi Pleyeri -->
     <audio id="bgMusic" loop src="pmml.mp3" preload="auto"></audio>
-    <button id="musicToggleBtn" class="music-btn">🎵</button>
+    <button id="musicToggleBtn" class="music-btn" title="Musiqi">🎵</button>
 
     <div class="container">
         <div id="card" class="card">
 
-            <!-- ADDIM 1: Qarşılama -->
+            <!-- ADDIM 1: Qarşılama Və Ad -->
             <div class="step active" id="step1">
                 <h1 id="greetingTitle">Xoş gəlmisiniz! 💕</h1>
-                <p id="guestNameText">Bizim date planımızı görmək üçün düyməyə sıxın.</p>
-                <button id="nextNameBtn" class="full-width-btn">Davam Et</button>
+                <p id="guestNameText">Bizim date planımızı görmək üçün adınızı daxil edin:</p>
+                
+                <div class="field-group">
+                    <input type="text" id="userName" placeholder="Adınız..." required>
+                </div>
+
+                <button id="nextNameBtn" class="full-width-btn">Davam Et ✨</button>
             </div>
 
-            <!-- ADDIM 2: Sual -->
+            <!-- ADDIM 2: Sual (Bəli / Xeyr) -->
             <div class="step" id="step2">
-                <h2>Salam Əzizim! 😍</h2>
+                <h2>Salam <span id="displayGuestName" class="highlight-name">Əzizim</span>! 😍</h2>
                 <p class="question-text">Mənimlə çıxarsan?</p>
                 <div class="btn-container">
                     <button id="yesBtn">Bəli, çıxaram! 💕</button>
-                    <button id="noBtn">Xeyr</button>
+                    <button id="noBtn">Xeyr 😢</button>
                 </div>
             </div>
 
@@ -51,7 +61,7 @@
                 <h2>Möhtəşəm Date Planı! 🎊</h2>
                 <div class="summary-box" id="finalSummary"></div>
                 <div class="ai-suggestion-box" id="finalAiBox"></div>
-                <p class="feedback-status">Görüşənədək! 💘</p>
+                <p class="feedback-status" id="sendStatus">Plan qeydə alındı və mail göndərildi! Səni səbirsizliklə gözləyirəm! 💘</p>
                 <button id="restartBtn" class="secondary-btn full-width-btn">Yenidən planlaşdır</button>
             </div>
 
