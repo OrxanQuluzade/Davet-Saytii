@@ -1,4 +1,4 @@
-/* =========================================
+\/* =========================================
    EMAILJS CONFIGURATION
 ========================================= */
 const EMAILJS_PUBLIC_KEY = "U4M_W0iXRCPd7lXqD";
@@ -22,41 +22,59 @@ const TARGET_EMAIL = "orxnquluzada@gmail.com";
 /* =========================================
    DOM ELEMENTS & AUDIO SETUP
 ========================================= */
-const nextNameBtn = document.getElementById("nextNameBtn");
-const yesBtn = document.getElementById("yesBtn");
-const noBtn = document.getElementById("noBtn");
-const submitBtn = document.getElementById("submitBtn");
-const feedbackBtn = document.getElementById("feedbackBtn");
-const bgMusic = document.getElementById("bgMusic");
-const musicToggleBtn = document.getElementById("musicToggleBtn");
+let nextNameBtn, yesBtn, noBtn, submitBtn, feedbackBtn, bgMusic, musicToggleBtn;
 
-/* =========================================
-   ROUTING ON INITIAL LOAD
-========================================= */
-window.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
+    nextNameBtn = document.getElementById("nextNameBtn");
+    yesBtn = document.getElementById("yesBtn");
+    noBtn = document.getElementById("noBtn");
+    submitBtn = document.getElementById("submitBtn");
+    feedbackBtn = document.getElementById("feedbackBtn");
+    bgMusic = document.getElementById("bgMusic");
+    musicToggleBtn = document.getElementById("musicToggleBtn");
+
+    // Səhifə yüklənəndə 1-ci addımı göstər
     showStep("step1");
+
+    // Səs Düyməsi İdarəetməsi
+    if (musicToggleBtn && bgMusic) {
+        musicToggleBtn.addEventListener("click", () => {
+            if (bgMusic.paused) {
+                bgMusic.play().then(() => {
+                    musicToggleBtn.textContent = "🎵";
+                }).catch(err => console.log("Səs xətası:", err));
+            } else {
+                bgMusic.pause();
+                musicToggleBtn.textContent = "🔇";
+            }
+        });
+    }
+
+    // Düymə Dinləyiciləri
+    if (nextNameBtn) {
+        nextNameBtn.addEventListener("click", (e) => {
+            submitName(e);
+            playAudio();
+        });
+    }
+
+    if (yesBtn) {
+        yesBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            playAudio();
+            nextStep(3);
+        });
+    }
+
+    if (submitBtn) submitBtn.addEventListener("click", finishSelection);
+    if (feedbackBtn) feedbackBtn.addEventListener("click", sendFeedback);
+
+    // Xeyr Düyməsinin Qaçma Sistemini Aktivləşdir
+    if (noBtn) {
+        noBtn.addEventListener("pointerdown", dodgeNoButton, { passive: false });
+        noBtn.addEventListener("mouseenter", dodgeNoButton);
+    }
 });
-
-/* =========================================
-   EVENT LISTENERS
-========================================= */
-if (nextNameBtn) {
-    nextNameBtn.addEventListener("click", (e) => {
-        submitName(e);
-        playAudio();
-    });
-}
-
-if (yesBtn) {
-    yesBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        playAudio();
-        nextStep(3);
-    });
-}
-
-if (submitBtn) submitBtn.addEventListener("click", finishSelection);
-if (feedbackBtn) feedbackBtn.addEventListener("click", sendFeedback);
 
 /* =========================================
    AUDIO PLAYBACK FUNCTION
@@ -66,21 +84,9 @@ function playAudio() {
         bgMusic.play().then(() => {
             if (musicToggleBtn) musicToggleBtn.textContent = "🎵";
         }).catch(err => {
-            console.log("Audio play error:", err);
+            console.log("Audio avtomatik oxuna bilmədi:", err);
         });
     }
-}
-
-if (musicToggleBtn && bgMusic) {
-    musicToggleBtn.addEventListener("click", () => {
-        if (bgMusic.paused) {
-            bgMusic.play();
-            musicToggleBtn.textContent = "🎵";
-        } else {
-            bgMusic.pause();
-            musicToggleBtn.textContent = "🔇";
-        }
-    });
 }
 
 /* =========================================
@@ -206,11 +212,6 @@ function dodgeNoButton(event) {
     setTimeout(() => {
         noBtnBusy = false;
     }, 60);
-}
-
-if (noBtn) {
-    noBtn.addEventListener("pointerdown", dodgeNoButton, { passive: false });
-    noBtn.addEventListener("mouseenter", dodgeNoButton);
 }
 
 window.addEventListener("resize", () => {
