@@ -23,19 +23,24 @@ body {
   top: 15px;
   right: 15px;
   z-index: 9999;
-  width: 45px;
-  height: 45px;
+  width: 48px;
+  height: 48px;
   padding: 0;
   margin: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
+  background: #ffffff;
   border: 2px solid #ffb6c1;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: transform 0.2s ease;
+}
+
+#musicToggleBtn:hover {
+  transform: scale(1.08);
 }
 
 /* --- MAIN CARD --- */
@@ -201,14 +206,6 @@ button:disabled {
 }
 
 /* --- OPTION CARDS --- */
-.option-group {
-  text-align: left;
-  background: #fff0f5;
-  padding: 16px;
-  border-radius: 14px;
-  margin-bottom: 15px;
-}
-
 .activity-options {
   display: grid;
   gap: 12px;
@@ -275,15 +272,6 @@ button:disabled {
 .small-text {
   font-size: 0.88rem;
   color: #777;
-}
-
-/* --- LINK GENERATOR STYLES --- */
-.generated-link-box {
-  background: #fff0f5;
-  padding: 16px;
-  border-radius: 14px;
-  margin: 15px 0;
-  border: 2px dashed #ffb6c1;
 }
 
 .secondary-btn {
