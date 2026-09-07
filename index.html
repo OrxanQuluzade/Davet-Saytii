@@ -2,112 +2,112 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Özəl Dəvət ❤️</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Canvas Confetti Library -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <title>Özəl Dəvət 💞</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .step-container {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+        .step-container.active {
+            display: block;
+        }
+        input, button, textarea {
+            margin-top: 10px;
+            display: block;
+            padding: 8px;
+        }
+        .radio-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="card">
-        <!-- STEP 1: NAME INPUT -->
-        <div id="step1" class="step active">
-            <h1>Xoş gəldiniz! ✨</h1>
-            <p>Sizə özəl bir sürprizim var. Zəhmət olmasa əvvəlcə adınızı daxil edin:</p>
-            <div class="field-group">
-                <input type="text" id="userName" placeholder="Adınız..." required>
-            </div>
-            <button id="nextNameBtn" class="full-width-btn">Davam Et 💖</button>
-        </div>
-
-        <!-- STEP 2: THE QUESTION (YES/NO) -->
-        <div id="step2" class="step">
-            <h2>Salam, <span id="askName" class="highlight-name"></span>! 🌸</h2>
-            <p class="question-text">Mənimlə gözəl bir gün keçirməyə razısan? ☕✨</p>
-            
-            <div class="btn-container">
-                <button id="yesBtn">BƏLİ! ❤️</button>
-                <button id="noBtn">Xeyr 😢</button>
-            </div>
-        </div>
-
-        <!-- STEP 3: DATE & ACTIVITY SELECTION -->
-        <div id="step3" class="step">
-            <h2>Əla seçim! Mən də çox şadam 🥰</h2>
-            <p>Gəl planımızı birlikdə quraq:</p>
-
-            <form id="dateForm" onsubmit="return false;">
-                <div class="field-group">
-                    <label class="label-text" for="datePicker">Tarix seçin:</label>
-                    <input type="date" id="datePicker" required>
-                </div>
-
-                <div class="field-group">
-                    <label class="label-text" for="timePicker">Saat seçin:</label>
-                    <input type="time" id="timePicker" required>
-                </div>
-
-                <h3 class="activity-title">Nə etmək istərdiniz? 🎈</h3>
-                <div class="activity-options">
-                    <label class="activity-card">
-                        <input type="radio" name="place" value="Qəhvə & Şirniyyat" checked>
-                        <span>☕ Rahat bir kofedə görüşmək</span>
-                    </label>
-                    <label class="activity-card">
-                        <input type="radio" name="place" value="Nahar / Şam Yeməyi">
-                        <span>🍕 Birlikdə ləzzətli yemək yemək</span>
-                    </label>
-                    <label class="activity-card">
-                        <input type="radio" name="place" value="Gəzinti & Park">
-                        <span>🌳 Şəhərdə/Parkda gəzintiyə çıxmaq</span>
-                    </label>
-                    <label class="activity-card">
-                        <input type="radio" name="place" value="Kino / Teatr">
-                        <span>🎬 Birlikdə film izləmək</span>
-                    </label>
-                    <label class="activity-card">
-                        <input type="radio" name="place" value="Other">
-                        <span>✨ Başqa bir ideya (Aşağıda qeyd edin)</span>
-                    </label>
-                </div>
-
-                <div class="field-group" style="margin-top: 10px;">
-                    <input type="text" id="customActivity" placeholder="Öz fəaliyyət ideyanızı yazın...">
-                </div>
-
-                <button id="submitBtn" class="full-width-btn">Seçimimi Təsdiqlə ❤️</button>
-            </form>
-        </div>
-
-        <!-- STEP 4: THANK YOU & SUMMARY -->
-        <div id="step4" class="step">
-            <div class="thank-you-box">
-                <h2>Görüşənədək, <span id="finalName" class="highlight-name"></span>! 🎉</h2>
-                <p class="thank-you-text">Dəvətimi qəbul etdiyin üçün təşəkkür edirəm. Görüşümüzün təfərrüatları:</p>
-                
-                <div class="summary-box">
-                    <p>📅 <strong>Tarix:</strong> <span id="summaryDate"></span></p>
-                    <p>⏰ <strong>Saat:</strong> <span id="summaryTime"></span></p>
-                    <p>📍 <strong>Plan:</strong> <span id="summaryPlace"></span></p>
-                </div>
-
-                <p>Səni səbirsizliklə gözləyəcəyəm! ❤️</p>
-            </div>
-
-            <!-- Optional Feedback -->
-            <div class="feedback-section">
-                <p class="small-text">Əlavə etmək istədiyin bir qeyd və ya sözün var?</p>
-                <input type="text" id="feedbackName" placeholder="Adınız (istəyə bağlı)">
-                <textarea id="feedbackMessage" placeholder="Mesajınız..."></textarea>
-                <button id="feedbackBtn" class="secondary-btn">Qeydi Göndər 💌</button>
-                <div id="feedbackStatus" class="feedback-status"></div>
-            </div>
-        </div>
+    <!-- 1. Addım: Ad -->
+    <div id="step-1" class="step-container active">
+        <h2>Xoş gəldiniz! ✨</h2>
+        <p>Sizə özəl bir sürintim var. Zəhmət olmasa əvvəlcə adınızı daxil edin:</p>
+        <input type="text" id="username" placeholder="Adınız...">
+        <button onclick="goToStep(2)">Davam Et 💞</button>
     </div>
 
-    <script src="index.js"></script>
+    <!-- 2. Addım: Görüşmək istəyi -->
+    <div id="step-2" class="step-container">
+        <h2 id="greeting-text"></h2>
+        <p>Mənimlə gözəl bir gün keçirməyə razısan? ☕ ✨</p>
+        <button onclick="goToStep(3)">BƏLİ! 💕</button>
+        <button onclick="alert('Xeyr seçimi qəbul olunmur! 😜')">Xeyr 🙄</button>
+    </div>
+
+    <!-- 3. Addım: Tarix və Seçimlər -->
+    <div id="step-3" class="step-container">
+        <h2>Əla seçimlər! Mən də çox şadam 🥰</h2>
+        <p>Gəl planımızı birlikdə quraq:</p>
+        <label>Tarix seçin: <input type="date" id="date-input"></label>
+        <label>Saat seçin: <input type="time" id="time-input"></label>
+        
+        <h3>Nə etmək istərdiniz? 🎈</h3>
+        <div class="radio-group">
+            <label><input type="radio" name="activity" value="Kofe" checked> ☕ Rahat bir kofedə görüşmək</label>
+            <label><input type="radio" name="activity" value="Yemək"> 🍕 Birlikdə ləzzətli yemək yemək</label>
+            <label><input type="radio" name="activity" value="Gəzinti"> 🌳 Şəhərdə/Parkda gəzintiyə çıxmaq</label>
+            <label><input type="radio" name="activity" value="Kino"> 🎬 Birlikdə film izləmək</label>
+            <label><input type="radio" name="activity" value="Digər"> ✨ Başqa bir ideya</label>
+        </div>
+        <button onclick="goToStep(4)">Seçimimi Təsdiqlə 💕</button>
+    </div>
+
+    <!-- 4. Addım: Sonluq / Təşəkkür -->
+    <div id="step-4" class="step-container">
+        <h2>Görüşənədək, ! 🎉</h2>
+        <p>Dəvəti qəbul etdiyin üçün təşəkkür edirəm. Görüşümüzün təfərrüatları:</p>
+        <p>📅 <strong>Tarix:</strong> <span id="res-date"></span></p>
+        <p>⏰ <strong>Saat:</strong> <span id="res-time"></span></p>
+        <p>📍 <strong>Plan:</strong> <span id="res-activity"></span></p>
+        <p>Səni səbirsizliklə gözləyəcəyəm! 💞</p>
+    </div>
+
+    <script>
+        function goToStep(stepNumber) {
+            // Əgər 1-dən 2-ci addıma keçirsə, adı yadda saxla
+            if (stepNumber === 2) {
+                const name = document.getElementById('username').value;
+                if (!name.trim()) {
+                    alert('Zəhmət olmasa adınızı daxil edin!');
+                    return;
+                }
+                document.getElementById('greeting-text').innerText = `Salam, ${name} ! 🌸`;
+            }
+
+            // Əgər 3-dən 4-cü addıma keçirsə, seçimləri ekrana yazdır
+            if (stepNumber === 4) {
+                document.getElementById('res-date').innerText = document.getElementById('date-input').value;
+                document.getElementById('res-time').innerText = document.getElementById('time-input').value;
+                
+                const selectedActivity = document.querySelector('input[name="activity"]:checked');
+                document.getElementById('res-activity').innerText = selectedActivity ? selectedActivity.value : '';
+            }
+
+            // Bütün addımları gizlət
+            const steps = document.querySelectorAll('.step-container');
+            steps.forEach(step => step.classList.remove('active'));
+
+            // İstənilən addımı göstər
+            document.getElementById('step-' + stepNumber).classList.add('active');
+        }
+    </script>
 </body>
 </html>
