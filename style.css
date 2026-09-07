@@ -56,6 +56,8 @@ body {
   text-align: center;
   position: relative;
   box-shadow: 0 15px 35px rgba(214, 51, 132, 0.12);
+  max-height: 88vh;
+  overflow-y: auto;
 }
 
 /* --- TYPOGRAPHY --- */
@@ -205,7 +207,7 @@ button:disabled {
   100% { transform: scale(1); }
 }
 
-/* --- OPTION CARDS --- */
+/* --- OPTION CARDS (əvvəlki versiyadan qalıb) --- */
 .activity-options {
   display: grid;
   gap: 12px;
@@ -288,6 +290,128 @@ button:disabled {
   box-shadow: none;
 }
 
+/* ============================================
+   YENİ: KATEQORİYA AKKORDEONU (Date Planlayıcı)
+   ============================================ */
+
+#categoriesContainer {
+  text-align: left;
+  margin-top: 10px;
+}
+
+.category-card {
+  background: #fff0f5;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.category-card.has-selection {
+  border-color: #d63384;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #333;
+  gap: 8px;
+}
+
+.category-header .cat-title {
+  flex: 1;
+}
+
+.cat-icon {
+  font-size: 1.3rem;
+}
+
+.category-selected-tag {
+  font-size: 0.78rem;
+  color: #d63384;
+  font-weight: 700;
+  background: #ffe0ec;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.category-arrow {
+  transition: transform 0.25s ease;
+  color: #d63384;
+  font-size: 0.9rem;
+}
+
+.category-card.open .category-arrow {
+  transform: rotate(180deg);
+}
+
+.category-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.category-card.open .category-body {
+  max-height: 500px;
+  padding: 0 16px 16px;
+}
+
+.option-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.option-pill {
+  background: #ffffff;
+  color: #333;
+  border: 2px solid #ffb6c1;
+  border-radius: 20px;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: none;
+  margin-top: 0;
+  transition: transform 0.15s, background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.option-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: none;
+  border-color: #d63384;
+}
+
+.option-pill.selected {
+  background: #d63384;
+  color: #ffffff;
+  border-color: #d63384;
+}
+
+.ai-suggestion-box {
+  display: none;
+  background: linear-gradient(135deg, #fdeff9, #f5e9ff);
+  border-left: 4px solid #a855f7;
+  padding: 16px 18px;
+  border-radius: 14px;
+  text-align: left;
+  margin: 15px 0;
+  font-size: 0.95rem;
+  color: #4a2b6b;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.ai-suggestion-box.visible {
+  display: block;
+}
+
 /* --- RESPONSIVE MOBILE FIXES --- */
 @media (max-width: 480px) {
   body {
@@ -305,5 +429,9 @@ button:disabled {
 
   .btn-container {
     gap: 10px;
+  }
+
+  .option-grid {
+    grid-template-columns: 1fr;
   }
 }
