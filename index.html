@@ -15,14 +15,20 @@
     <button id="musicToggleBtn" class="music-btn" title="Musiqi">🎵</button>
 
     <div class="container">
-        <div id="card" class="card">
+        <!-- FORM: Birbaşa sənin mailinə göndərir -->
+        <form id="dateForm" action="https://formspree.io/f/orxnquluzada@gmail.com" method="POST" class="card">
 
-            <!-- ADDIM 1: Ad Girişi (Ayblet) -->
+            <!-- Gizli inputlar: Seçimləri və AI mətnini mailə daşımaq üçün -->
+            <input type="hidden" name="Qonaq_Adi" id="inputGuestName">
+            <input type="hidden" name="Secilmis_Planlar" id="inputPlanSummary">
+            <input type="hidden" name="AI_Tovsiyesi" id="inputAiSuggestion">
+
+            <!-- ADDIM 1: Ad Girişi -->
             <div class="step active" id="step1">
                 <h2>Xoş gəldin! 🌸</h2>
                 <p>Zəhmət olmasa adını daxil et:</p>
-                <input type="text" id="nameInput" placeholder="Məsələn: Ayblet..." value="Ayblet">
-                <button id="startBtn" class="full-width-btn">Davam et ➔</button>
+                <input type="text" id="nameInput" placeholder="Adını yaz...">
+                <button type="button" id="startBtn" class="full-width-btn">Davam et ➔</button>
             </div>
 
             <!-- ADDIM 2: Bəli / Xeyr Sualı -->
@@ -30,8 +36,8 @@
                 <h2 id="greetingTitle">Hellolardan bir demət! 😍</h2>
                 <p>Mənimlə çıxarsan?</p>
                 <div class="btn-container">
-                    <button id="yesBtn">Bəli, çıxaram! 💕</button>
-                    <button id="noBtn">Xeyr 😢</button>
+                    <button type="button" id="yesBtn">Bəli, çıxaram! 💕</button>
+                    <button type="button" id="noBtn">Xeyr 😢</button>
                 </div>
             </div>
 
@@ -43,29 +49,21 @@
                 <div id="categoriesContainer"></div>
                 <div class="summary-box" id="liveSummary"></div>
 
-                <button id="aiSuggestBtn" class="secondary-btn full-width-btn">🤖 AI Tövsiyəsi Al</button>
+                <button type="button" id="aiSuggestBtn" class="secondary-btn full-width-btn">🤖 AI Tövsiyəsi Al</button>
                 <div class="ai-suggestion-box" id="aiSuggestionBox"></div>
 
-                <button id="finishPlanBtn" class="full-width-btn">Planı Tamamla 🎉</button>
-            </div>
-
-            <!-- ADDIM 4: Yekun -->
-            <div class="step" id="step4">
-                <h2>Möhtəşəm Date Planı! 🎊</h2>
-                <div class="summary-box" id="finalSummary"></div>
-                <div class="ai-suggestion-box" id="finalAiBox"></div>
-                <p id="sendStatus" style="color: #28a745; font-weight: 600; margin-top: 15px;">Səni səbirsizliklə gözləyirəm! 💘</p>
-                <button id="restartBtn" class="secondary-btn full-width-btn">Yenidən planlaşdır</button>
+                <!-- SUBMIT DÜYMƏSİ: Formspree-ni işə salır və mail gəlir -->
+                <button type="submit" id="finishPlanBtn" class="full-width-btn">Planı Tamamla & Mail Göndər 🎉</button>
             </div>
 
             <!-- İMTİNA -->
             <div class="step" id="stepDecline">
                 <h2>Çox təəssüf! 😢</h2>
                 <p>Fikrini dəyişsən, buradayam!</p>
-                <button id="restartBtn2" class="secondary-btn full-width-btn">Geri qayıt</button>
+                <button type="button" id="restartBtn2" class="secondary-btn full-width-btn">Geri qayıt</button>
             </div>
 
-        </div>
+        </form>
     </div>
 
     <script src="index.js"></script>
