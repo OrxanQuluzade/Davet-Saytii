@@ -12,11 +12,11 @@
 </head>
 <body>
 
-    <!-- Background Music (Local Repository File) -->
-    <audio id="bgMusic" loop src="pmml.mp3"></audio>
+    <!-- Background Music -->
+    <audio id="bgMusic" loop src="pmml.mp3" preload="auto"></audio>
 
     <!-- Floating Music Toggle Button -->
-    <button id="musicToggleBtn" title="Musiqini idarə et">🎵</button>
+    <button id="musicToggleBtn" type="button" title="Musiqini idarə et">🎵</button>
 
     <div class="card">
         <!-- STEP 1: NAME INPUT -->
@@ -26,7 +26,7 @@
             <div class="field-group">
                 <input type="text" id="userName" placeholder="Adınız..." required>
             </div>
-            <button id="nextNameBtn" class="full-width-btn">Davam Et 💖</button>
+            <button id="nextNameBtn" type="button" class="full-width-btn">Davam Et 💖</button>
         </div>
 
         <!-- STEP 2: THE QUESTION (YES/NO) -->
@@ -35,8 +35,8 @@
             <p class="question-text">Mənimlə gözəl bir gün keçirməyə razısan? ☕✨</p>
             
             <div class="btn-container">
-                <button id="yesBtn">BƏLİ! ❤️</button>
-                <button id="noBtn">Xeyr 😢</button>
+                <button id="yesBtn" type="button">BƏLİ! ❤️</button>
+                <button id="noBtn" type="button">Xeyr 😢</button>
             </div>
         </div>
 
@@ -84,7 +84,7 @@
                     <input type="text" id="customActivity" placeholder="Öz fəaliyyət ideyanızı yazın...">
                 </div>
 
-                <button id="submitBtn" class="full-width-btn">Seçimimi Təsdiqlə ❤️</button>
+                <button id="submitBtn" type="button" class="full-width-btn">Seçimimi Təsdiqlə ❤️</button>
             </form>
         </div>
 
@@ -103,12 +103,12 @@
                 <p>Səni səbirsizliklə gözləyəcəyəm! ❤️</p>
             </div>
 
-            <!-- Optional Feedback -->
+            <!-- Feedback -->
             <div class="feedback-section">
                 <p class="small-text">Əlavə etmək istədiyin bir qeyd və ya sözün var?</p>
                 <input type="text" id="feedbackName" placeholder="Adınız (istəyə bağlı)">
                 <textarea id="feedbackMessage" placeholder="Mesajınız..."></textarea>
-                <button id="feedbackBtn" class="secondary-btn">Qeydi Göndər 💌</button>
+                <button id="feedbackBtn" type="button" class="secondary-btn">Qeydi Göndər 💌</button>
                 <div id="feedbackStatus" class="feedback-status"></div>
             </div>
         </div>
