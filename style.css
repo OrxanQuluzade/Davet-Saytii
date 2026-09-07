@@ -1,437 +1,267 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+/* =========================================
+   EMAILJS KONFİQURASİYASI
+========================================= */
+const EMAILJS_PUBLIC_KEY = "U4M_W0iXRCPd7lXqD";
+const EMAILJS_SERVICE_ID = "service_ew9gjz1";
+const EMAILJS_TEMPLATE_ID = "template_g5kwrzq";
+const TARGET_EMAIL = "orxnquluzada@gmail.com";
 
-* {
-  box-sizing: border-box;
-  font-family: 'Plus Jakarta Sans', "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0;
-  padding: 0;
+if (typeof emailjs !== "undefined") {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
 }
 
-body {
-  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #feada6 100%);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  color: #333;
+/* =========================================
+   KATEQORİYALAR & SEÇİMLƏR
+========================================= */
+const categories = [
+    {
+        id: "food",
+        title: "🍕 Yemək / Məkan",
+        options: ["Qəhvə & Desert", "Pizza & Burger", "Romantik Şam Yeməyi", "Şərq Mətbəxi", "Piknik"]
+    },
+    {
+        id: "activity",
+        title: "🎬 Əyləncə & Fəaliyyət",
+        options: ["Kino / Teatr", "Parkda Gəzinti", "Bouling / Kartinq", "Muzey / Sərgi", "Karaoke"]
+    },
+    {
+        id: "time",
+        title: "⏰ Vaxt Seçimi",
+        options: ["Səhər (10:00 - 13:00)", "Günorta (14:00 - 17:00)", "Axşam (18:00 - 21:00)"]
+    }
+];
+
+let selectedOptions = {};
+let currentUserName = "";
+
+/* =========================================
+   ƏSAS MƏNTİQ
+========================================= */
+document.addEventListener("DOMContentLoaded", () => {
+    const bgMusic = document.getElementById("bgMusic");
+    const musicToggleBtn = document.getElementById("musicToggleBtn");
+    
+    const userNameInput = document.getElementById("userName");
+    const nextNameBtn = document.getElementById("nextNameBtn");
+    const displayGuestName = document.getElementById("displayGuestName");
+    
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const aiSuggestBtn = document.getElementById("aiSuggestBtn");
+    const finishPlanBtn = document.getElementById("finishPlanBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const restartBtn2 = document.getElementById("restartBtn2");
+
+    // --- Musiqi Funksiyası ---
+    function playAudio() {
+        if (bgMusic && bgMusic.paused) {
+            bgMusic.play().then(() => {
+                if (musicToggleBtn) musicToggleBtn.textContent = "🎵";
+            }).catch(err => console.log("Audio avtomatik icazə gözləyir:", err));
+        }
+    }
+
+    if (musicToggleBtn && bgMusic) {
+        musicToggleBtn.addEventListener("click", () => {
+            if (bgMusic.paused) {
+                playAudio();
+            } else {
+                bgMusic.pause();
+                musicToggleBtn.textContent = "🔇";
+            }
+        });
+    }
+
+    // --- Addım 1 ➔ Addım 2 (Adı almaq) ---
+    if (nextNameBtn) {
+        nextNameBtn.addEventListener("click", () => {
+            const val = userNameInput ? userNameInput.value.trim() : "";
+            if (!val) {
+                alert("Zəhmət olmasa adınızı daxil edin!");
+                return;
+            }
+            currentUserName = val;
+            if (displayGuestName) displayGuestName.textContent = currentUserName;
+            
+            playAudio();
+            showStep("step2");
+        });
+    }
+
+    // --- Addım 2: Bəli / Xeyr ---
+    if (yesBtn) {
+        yesBtn.addEventListener("click", () => {
+            playAudio();
+            renderCategories();
+            showStep("step3");
+        });
+    }
+
+    if (noBtn) {
+        // "Xeyr" düyməsindən qaçmaq effekti
+        noBtn.addEventListener("mouseover", () => {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40);
+            noBtn.style.position = "fixed";
+            noBtn.style.left = `${Math.max(10, x)}px`;
+            noBtn.style.top = `${Math.max(10, y)}px`;
+        });
+
+        noBtn.addEventListener("click", () => {
+            showStep("stepDecline");
+        });
+    }
+
+    // --- AI Tövsiyəsi ---
+    if (aiSuggestBtn) {
+        aiSuggestBtn.addEventListener("click", () => {
+            const aiBox = document.getElementById("aiSuggestionBox");
+            const suggestions = [
+                "💡 AI Tövsiyəsi: Rahat bir kofedə başlayıb, sonra parkda gəzintiyə çıxmaq əla olar!",
+                "💡 AI Tövsiyəsi: Birlikdə Dadlı pizza yeyib ardınca maraqlı bir film izləyə bilərsiniz! 🍕🎬",
+                "💡 AI Tövsiyəsi: Axşamüstü gəzinti və ardınca şirin desertlər günü unudulmaz edəcək! 🍰✨"
+            ];
+            const randomSuggest = suggestions[Math.floor(Math.random() * suggestions.length)];
+            if (aiBox) {
+                aiBox.textContent = randomSuggest;
+                aiBox.style.display = "block";
+            }
+        });
+    }
+
+    // --- Addım 3 ➔ Addım 4 (Tamamlama və Mail Göndərmə) ---
+    if (finishPlanBtn) {
+        finishPlanBtn.addEventListener("click", async () => {
+            const summaryText = buildSummaryText();
+
+            // Yekun interfeysi doldur
+            const finalSummary = document.getElementById("finalSummary");
+            if (finalSummary) {
+                finalSummary.innerHTML = `
+                    <p>👤 <strong>Qonaq:</strong> ${currentUserName}</p>
+                    ${summaryText}
+                `;
+            }
+
+            const aiBoxContent = document.getElementById("aiSuggestionBox")?.textContent || "";
+            const finalAiBox = document.getElementById("finalAiBox");
+            if (finalAiBox && aiBoxContent) {
+                finalAiBox.textContent = aiBoxContent;
+                finalAiBox.style.display = "block";
+            }
+
+            // Mail Göndər
+            const sendStatus = document.getElementById("sendStatus");
+            if (sendStatus) sendStatus.textContent = "Plan mailə göndərilir... ⏳";
+
+            if (typeof emailjs !== "undefined") {
+                try {
+                    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                        target_email: TARGET_EMAIL,
+                        user_name: currentUserName,
+                        plan_details: getSummaryPlain(),
+                        ai_suggestion: aiBoxContent
+                    });
+                    if (sendStatus) sendStatus.textContent = "Plan mailinə uğurla göndərildi! Səni səbirsizliklə gözləyirəm! 💘";
+                } catch (err) {
+                    console.error("Mail göndərilmədi:", err);
+                    if (sendStatus) sendStatus.textContent = "Plan qeydə alındı! (Mail göndərilərkən xəta oldu)";
+                }
+            }
+
+            showStep("step4");
+            if (window.confetti) confetti();
+        });
+    }
+
+    // --- Yenidən Başla ---
+    if (restartBtn) restartBtn.addEventListener("click", resetAll);
+    if (restartBtn2) restartBtn2.addEventListener("click", resetAll);
+
+    function resetAll() {
+        selectedOptions = {};
+        currentUserName = "";
+        if (userNameInput) userNameInput.value = "";
+        document.getElementById("liveSummary").innerHTML = "";
+        document.getElementById("aiSuggestionBox").style.display = "none";
+        showStep("step1");
+    }
+});
+
+/* =========================================
+   KÖMƏKÇİ FUNKSİYALAR
+========================================= */
+function showStep(stepId) {
+    document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+    const target = document.getElementById(stepId);
+    if (target) target.classList.add("active");
 }
 
-/* --- FLOATING MUSIC BUTTON --- */
-#musicToggleBtn {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  z-index: 9999;
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  margin: 0;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 2px solid #ffb6c1;
-  font-size: 1.3rem;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: transform 0.2s ease;
+function renderCategories() {
+    const container = document.getElementById("categoriesContainer");
+    if (!container) return;
+    container.innerHTML = "";
+
+    categories.forEach(cat => {
+        const catDiv = document.createElement("div");
+        catDiv.className = "category-block";
+
+        const title = document.createElement("h3");
+        title.textContent = cat.title;
+        catDiv.appendChild(title);
+
+        const optionsDiv = document.createElement("div");
+        optionsDiv.className = "options-grid";
+
+        cat.options.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.textContent = opt;
+
+            if (selectedOptions[cat.id] === opt) {
+                btn.classList.add("selected");
+            }
+
+            btn.addEventListener("click", () => {
+                if (selectedOptions[cat.id] === opt) {
+                    delete selectedOptions[cat.id];
+                } else {
+                    selectedOptions[cat.id] = opt;
+                }
+                renderCategories();
+                updateLiveSummary();
+            });
+
+            optionsDiv.appendChild(btn);
+        });
+
+        catDiv.appendChild(optionsDiv);
+        container.appendChild(catDiv);
+    });
 }
 
-#musicToggleBtn:hover {
-  transform: scale(1.08);
+function updateLiveSummary() {
+    const box = document.getElementById("liveSummary");
+    if (!box) return;
+    box.innerHTML = buildSummaryText() || "<p>Hələ heç nə seçilməyib.</p>";
 }
 
-/* --- MAIN CARD --- */
-.card {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  width: 100%;
-  max-width: 520px;
-  padding: 35px 28px;
-  border-radius: 24px;
-  text-align: center;
-  position: relative;
-  box-shadow: 0 15px 35px rgba(214, 51, 132, 0.12);
-  max-height: 88vh;
-  overflow-y: auto;
+function buildSummaryText() {
+    let html = "";
+    categories.forEach(cat => {
+        if (selectedOptions[cat.id]) {
+            html += `<p><strong>${cat.title}:</strong> ${selectedOptions[cat.id]}</p>`;
+        }
+    });
+    return html;
 }
 
-/* --- TYPOGRAPHY --- */
-h1, h2, h3 {
-  color: #d63384;
-  margin-bottom: 18px;
-  letter-spacing: -0.3px;
-}
-
-p {
-  color: #555;
-  font-size: 1.02rem;
-  line-height: 1.5;
-  margin-bottom: 15px;
-}
-
-.highlight-name {
-  color: #d63384;
-  font-weight: 700;
-}
-
-.question-text {
-  font-weight: 700;
-  font-size: 1.25rem;
-  margin-top: 15px;
-  color: #333;
-}
-
-/* --- STEP TRANSITIONS --- */
-.step {
-  display: none;
-  opacity: 0;
-  transition: opacity 0.35s ease-in-out;
-}
-
-.step.active {
-  display: block;
-  opacity: 1;
-}
-
-/* --- FORM INPUTS --- */
-.field-group {
-  text-align: left;
-  margin-bottom: 15px;
-}
-
-.label-text {
-  display: block;
-  text-align: left;
-  font-weight: 600;
-  color: #444;
-  margin-bottom: 6px;
-  font-size: 0.95rem;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="date"],
-input[type="time"],
-textarea {
-  width: 100%;
-  padding: 13px 15px;
-  margin: 6px 0 15px;
-  border: 2px solid #ffb6c1;
-  border-radius: 12px;
-  font-size: 0.98rem;
-  outline: none;
-  background-color: #ffffff;
-  display: block;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 90px;
-}
-
-input:focus,
-textarea:focus {
-  border-color: #d63384;
-  box-shadow: 0 0 0 4px rgba(214, 51, 132, 0.12);
-}
-
-/* --- BUTTONS --- */
-button {
-  background: linear-gradient(135deg, #ff416c, #ff4b2b);
-  color: white;
-  border: none;
-  padding: 13px 28px;
-  font-size: 1rem;
-  font-weight: 700;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  margin-top: 10px;
-  box-shadow: 0 5px 15px rgba(255, 65, 108, 0.25);
-}
-
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 75, 43, 0.35);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.full-width-btn {
-  width: 100%;
-}
-
-/* --- DODGING NO BUTTON CONTAINER --- */
-.btn-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  margin-top: 20px;
-  position: relative;
-  min-height: 80px;
-}
-
-#noBtn {
-  background: #6c757d;
-  touch-action: none;
-  box-shadow: none;
-  z-index: 10;
-}
-
-#noBtn.dodging {
-  position: absolute;
-}
-
-#noBtn.dodge-pulse {
-  animation: dodgePulse 0.18s ease-out;
-}
-
-@keyframes dodgePulse {
-  0% { transform: scale(1); }
-  40% { transform: scale(0.85); }
-  100% { transform: scale(1); }
-}
-
-/* --- OPTION CARDS (əvvəlki versiyadan qalıb) --- */
-.activity-options {
-  display: grid;
-  gap: 12px;
-  margin-top: 15px;
-}
-
-.activity-card {
-  display: flex;
-  align-items: center;
-  padding: 14px 16px;
-  text-align: left;
-  border-radius: 12px;
-  background: #fff0f5;
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: transform 0.2s, border-color 0.2s, background 0.2s;
-}
-
-.activity-card:hover {
-  border-color: #ff6b9d;
-  transform: translateY(-2px);
-}
-
-.activity-card:has(input:checked) {
-  border-color: #d63384;
-  background: #ffe0ec;
-}
-
-.activity-card input[type="radio"] {
-  margin-right: 12px;
-  accent-color: #d63384;
-  width: 18px;
-  height: 18px;
-}
-
-/* --- SUMMARY & FEEDBACK --- */
-.summary-box {
-  background: #ffffff;
-  padding: 18px;
-  border-radius: 14px;
-  text-align: left;
-  margin: 20px 0;
-  border-left: 4px solid #d63384;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-}
-
-.summary-box p {
-  margin: 8px 0;
-  font-size: 0.95rem;
-}
-
-.feedback-section {
-  margin-top: 25px;
-  padding-top: 20px;
-  border-top: 2px dashed #ffb6c1;
-}
-
-.feedback-status {
-  margin-top: 10px;
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.small-text {
-  font-size: 0.88rem;
-  color: #777;
-}
-
-.secondary-btn {
-  background: transparent;
-  color: #d63384;
-  border: 2px solid #d63384;
-  margin-top: 15px;
-  width: 100%;
-  box-shadow: none;
-}
-
-.secondary-btn:hover {
-  background: #ffe0ec;
-  box-shadow: none;
-}
-
-/* ============================================
-   YENİ: KATEQORİYA AKKORDEONU (Date Planlayıcı)
-   ============================================ */
-
-#categoriesContainer {
-  text-align: left;
-  margin-top: 10px;
-}
-
-.category-card {
-  background: #fff0f5;
-  border-radius: 14px;
-  margin-bottom: 12px;
-  overflow: hidden;
-  border: 2px solid transparent;
-  transition: border-color 0.2s;
-}
-
-.category-card.has-selection {
-  border-color: #d63384;
-}
-
-.category-header {
-  display: flex;
-  align-items: center;
-  padding: 14px 16px;
-  cursor: pointer;
-  font-weight: 700;
-  color: #333;
-  gap: 8px;
-}
-
-.category-header .cat-title {
-  flex: 1;
-}
-
-.cat-icon {
-  font-size: 1.3rem;
-}
-
-.category-selected-tag {
-  font-size: 0.78rem;
-  color: #d63384;
-  font-weight: 700;
-  background: #ffe0ec;
-  padding: 3px 10px;
-  border-radius: 20px;
-  white-space: nowrap;
-}
-
-.category-arrow {
-  transition: transform 0.25s ease;
-  color: #d63384;
-  font-size: 0.9rem;
-}
-
-.category-card.open .category-arrow {
-  transform: rotate(180deg);
-}
-
-.category-body {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-
-.category-card.open .category-body {
-  max-height: 500px;
-  padding: 0 16px 16px;
-}
-
-.option-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.option-pill {
-  background: #ffffff;
-  color: #333;
-  border: 2px solid #ffb6c1;
-  border-radius: 20px;
-  padding: 9px 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: none;
-  margin-top: 0;
-  transition: transform 0.15s, background 0.2s, border-color 0.2s, color 0.2s;
-}
-
-.option-pill:hover {
-  transform: translateY(-2px);
-  box-shadow: none;
-  border-color: #d63384;
-}
-
-.option-pill.selected {
-  background: #d63384;
-  color: #ffffff;
-  border-color: #d63384;
-}
-
-.ai-suggestion-box {
-  display: none;
-  background: linear-gradient(135deg, #fdeff9, #f5e9ff);
-  border-left: 4px solid #a855f7;
-  padding: 16px 18px;
-  border-radius: 14px;
-  text-align: left;
-  margin: 15px 0;
-  font-size: 0.95rem;
-  color: #4a2b6b;
-  font-weight: 600;
-  line-height: 1.5;
-}
-
-.ai-suggestion-box.visible {
-  display: block;
-}
-
-/* --- RESPONSIVE MOBILE FIXES --- */
-@media (max-width: 480px) {
-  body {
-    padding: 12px;
-  }
-
-  .card {
-    padding: 24px 18px;
-    margin-top: 5px;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-  }
-
-  .btn-container {
-    gap: 10px;
-  }
-
-  .option-grid {
-    grid-template-columns: 1fr;
-  }
+function getSummaryPlain() {
+    let text = "";
+    categories.forEach(cat => {
+        if (selectedOptions[cat.id]) {
+            text += `${cat.title}: ${selectedOptions[cat.id]}\n`;
+        }
+    });
+    return text || "Heç nə seçilməyib";
 }
