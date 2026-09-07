@@ -28,6 +28,8 @@ const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
 const submitBtn = document.getElementById("submitBtn");
 const feedbackBtn = document.getElementById("feedbackBtn");
+const bgMusic = document.getElementById("bgMusic");
+const musicToggleBtn = document.getElementById("musicToggleBtn");
 
 /* =========================================
    ROUTING ON INITIAL LOAD (DIRECT TO STEP 1)
@@ -52,6 +54,21 @@ if (submitBtn) submitBtn.addEventListener("click", finishSelection);
 if (feedbackBtn) feedbackBtn.addEventListener("click", sendFeedback);
 
 /* =========================================
+   BACKGROUND MUSIC CONTROLLER
+========================================= */
+if (musicToggleBtn && bgMusic) {
+    musicToggleBtn.addEventListener("click", () => {
+        if (bgMusic.paused) {
+            bgMusic.play();
+            musicToggleBtn.textContent = "🎵";
+        } else {
+            bgMusic.pause();
+            musicToggleBtn.textContent = "🔇";
+        }
+    });
+}
+
+/* =========================================
    STEP NAVIGATION
 ========================================= */
 function showStep(stepId) {
@@ -67,7 +84,7 @@ function nextStep(stepNumber) {
 }
 
 /* =========================================
-   STEP 1: NAME VALIDATION
+   STEP 1: NAME VALIDATION & AUDIO TRIGGER
 ========================================= */
 function submitName(event) {
     if (event) event.preventDefault();
@@ -80,6 +97,11 @@ function submitName(event) {
     if (!nameInput) {
         alert("Zəhmət olmasa əvvəlcə adınızı daxil edin!");
         return;
+    }
+
+    /* Trigger Audio on First User Interaction */
+    if (bgMusic && bgMusic.paused) {
+        bgMusic.play().catch(err => console.log("Audio play blocked/failed:", err));
     }
 
     const askNameEl = document.getElementById("askName");
