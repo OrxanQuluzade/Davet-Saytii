@@ -3,22 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dəvətnamə</title>
+    <title>Bizim Date Planımız 💕</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- Musiqi Pleyeri (Zəmanətli Onlayn Audio Linki) -->
-    <audio id="bgMusic" loop src="https://files.freemusicarchive.org/storage-freemusicarchive-org/tracks/79bOefK8vQkGTo3S8fpt8hP03qBq0Wl1bWJtY5eJ.mp3" preload="auto"></audio>
-
-    <!-- Musiqi Yandırıb-Söndürmə Düyməsi -->
+    <!-- Musiqi Pleyeri -->
+    <audio id="bgMusic" loop src="pmml.mp3" preload="auto"></audio>
     <button id="musicToggleBtn" class="music-btn">🎵</button>
 
     <div class="container">
         <div id="card" class="card">
-            <h1 id="greetingTitle">Xoş gəlmisiniz!</h1>
-            <p id="guestNameText">Dəvətnamənizi görmək üçün düyməyə sıxın.</p>
-            <button id="nextNameBtn" class="action-btn">Davam Et</button>
+
+            <!-- ADDIM 1: Qarşılama -->
+            <div class="step active" id="step1">
+                <h1 id="greetingTitle">Xoş gəlmisiniz! 💕</h1>
+                <p id="guestNameText">Bizim date planımızı görmək üçün düyməyə sıxın.</p>
+                <button id="nextNameBtn" class="full-width-btn">Davam Et</button>
+            </div>
+
+            <!-- ADDIM 2: Sual -->
+            <div class="step" id="step2">
+                <h2>Salam Əzizim! 😍</h2>
+                <p class="question-text">Mənimlə çıxarsan?</p>
+                <div class="btn-container">
+                    <button id="yesBtn">Bəli, çıxaram! 💕</button>
+                    <button id="noBtn">Xeyr</button>
+                </div>
+            </div>
+
+            <!-- ADDIM 3: Planlaşdırıcı -->
+            <div class="step" id="step3">
+                <h2>Planımızı Quraq! 🗓️</h2>
+                <p class="small-text">İstədiyin kateqoriyaya bas və seç. İstədiyin qədər kateqoriya seçə bilərsən.</p>
+
+                <div id="categoriesContainer"></div>
+
+                <div class="summary-box" id="liveSummary"></div>
+
+                <button id="aiSuggestBtn" class="secondary-btn full-width-btn">🤖 AI Tövsiyəsi Al</button>
+                <div class="ai-suggestion-box" id="aiSuggestionBox"></div>
+
+                <button id="finishPlanBtn" class="full-width-btn">Planı Tamamla 🎉</button>
+            </div>
+
+            <!-- ADDIM 4: Yekun -->
+            <div class="step" id="step4">
+                <h2>Möhtəşəm Date Planı! 🎊</h2>
+                <div class="summary-box" id="finalSummary"></div>
+                <div class="ai-suggestion-box" id="finalAiBox"></div>
+                <p class="feedback-status">Görüşənədək! 💘</p>
+                <button id="restartBtn" class="secondary-btn full-width-btn">Yenidən planlaşdır</button>
+            </div>
+
+            <!-- ADDIM: İmtina cavabı -->
+            <div class="step" id="stepDecline">
+                <h2>Çox təəssüf! 😢</h2>
+                <p>Fikrini dəyişsən, buradayam!</p>
+                <button id="restartBtn2" class="secondary-btn full-width-btn">Geri qayıt</button>
+            </div>
+
         </div>
     </div>
 
