@@ -4,50 +4,201 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bizim Date Planımız 💕</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Canvas Confetti (Konfeti effekti üçün) -->
+    <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- EmailJS SDK (Mail göndərmək üçün) -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .music-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ffffff;
+            border: none;
+            font-size: 20px;
+            padding: 10px 14px;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 30px 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* ADDIMLARIN GİZLƏDİLMƏSİ */
+        .step {
+            display: none !important;
+        }
+
+        .step.active {
+            display: block !important;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2 {
+            color: #ff4b2b;
+            margin-bottom: 12px;
+            font-size: 22px;
+        }
+
+        h3 {
+            color: #444;
+            font-size: 15px;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        p {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .full-width-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(255, 75, 43, 0.3);
+            margin-top: 10px;
+        }
+
+        .secondary-btn {
+            background: #f0f0f0;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-container button {
+            flex: 1;
+            padding: 12px;
+        }
+
+        #yesBtn { background: #28a745; color: white; }
+        #noBtn { background: #dc3545; color: white; }
+
+        .category-block { margin-bottom: 18px; }
+
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .option-btn {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #495057;
+            padding: 8px 12px;
+            font-size: 13px;
+            border-radius: 20px;
+        }
+
+        .option-btn.selected {
+            background: #ff416c;
+            color: #ffffff;
+            border-color: #ff416c;
+        }
+
+        .summary-box {
+            background: #fff5f5;
+            border: 1px dashed #ffb3b3;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: left;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        .ai-suggestion-box {
+            display: none;
+            background: #f0f8ff;
+            border: 1px solid #b8daff;
+            color: #004085;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .feedback-status {
+            color: #28a745;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Musiqi Pleyeri (Birbaşa repo keçidi ilə) -->
     <audio id="bgMusic" loop src="https://raw.githubusercontent.com/OrxanQuluzade/Davet-Saytii/main/pmml.mp3" preload="auto"></audio>
     <button id="musicToggleBtn" class="music-btn" title="Musiqi">🎵</button>
 
     <div class="container">
         <div id="card" class="card">
 
-            <!-- ADDIM 1: Qarşılama Və Ad -->
-            <div class="step active" id="step1">
-                <h1 id="greetingTitle">Xoş gəlmisiniz! 💕</h1>
-                <p id="guestNameText">Bizim date planımızı görmək üçün adınızı daxil edin:</p>
-                
-                <div class="field-group">
-                    <input type="text" id="userName" placeholder="Adınız..." required>
-                </div>
-
-                <button id="nextNameBtn" class="full-width-btn">Davam Et ✨</button>
-            </div>
-
-            <!-- ADDIM 2: Sual (Bəli / Xeyr) -->
-            <div class="step" id="step2">
-                <h2>Salam <span id="displayGuestName" class="highlight-name">Əzizim</span>! 😍</h2>
-                <p class="question-text">Mənimlə çıxarsan?</p>
+            <!-- İLK ADDIM: Birbaşa Qarşılama Və Sual -->
+            <div class="step active" id="step2">
+                <h2>Hellolardan bir demət Nərmin xanım! 😍</h2>
+                <p>Mənimlə çıxarsan?</p>
                 <div class="btn-container">
                     <button id="yesBtn">Bəli, çıxaram! 💕</button>
                     <button id="noBtn">Xeyr 😢</button>
                 </div>
             </div>
 
-            <!-- ADDIM 3: Planlaşdırıcı -->
+            <!-- İKİNCİ ADDIM: Planlaşdırıcı -->
             <div class="step" id="step3">
                 <h2>Planımızı Quraq! 🗓️</h2>
-                <p class="small-text">İstədiyin kateqoriyaya bas və seç. İstədiyin qədər kateqoriya seçə bilərsən.</p>
+                <p style="font-size: 13px;">İstədiyin kateqoriyaya bas və seç:</p>
 
                 <div id="categoriesContainer"></div>
-
                 <div class="summary-box" id="liveSummary"></div>
 
                 <button id="aiSuggestBtn" class="secondary-btn full-width-btn">🤖 AI Tövsiyəsi Al</button>
@@ -56,16 +207,16 @@
                 <button id="finishPlanBtn" class="full-width-btn">Planı Tamamla 🎉</button>
             </div>
 
-            <!-- ADDIM 4: Yekun -->
+            <!-- ÜÇÜNCÜ ADDIM: Yekun -->
             <div class="step" id="step4">
                 <h2>Möhtəşəm Date Planı! 🎊</h2>
                 <div class="summary-box" id="finalSummary"></div>
                 <div class="ai-suggestion-box" id="finalAiBox"></div>
-                <p class="feedback-status" id="sendStatus">Plan qeydə alındı və mail göndərildi! Səni səbirsizliklə gözləyirəm! 💘</p>
+                <p class="feedback-status" id="sendStatus">Səni səbirsizliklə gözləyirəm! 💘</p>
                 <button id="restartBtn" class="secondary-btn full-width-btn">Yenidən planlaşdır</button>
             </div>
 
-            <!-- ADDIM: İmtina cavabı -->
+            <!-- İMTİNA ADDIMI -->
             <div class="step" id="stepDecline">
                 <h2>Çox təəssüf! 😢</h2>
                 <p>Fikrini dəyişsən, buradayam!</p>
