@@ -1,4 +1,4 @@
-\/* =========================================
+/* =========================================
    EMAILJS CONFIGURATION
 ========================================= */
 const EMAILJS_PUBLIC_KEY = "U4M_W0iXRCPd7lXqD";
@@ -20,7 +20,7 @@ const TARGET_EMAIL = "orxnquluzada@gmail.com";
 })();
 
 /* =========================================
-   DOM ELEMENTS & AUDIO SETUP
+   GLOBAL VARIABLES & DOM CONTROLLER
 ========================================= */
 let nextNameBtn, yesBtn, noBtn, submitBtn, feedbackBtn, bgMusic, musicToggleBtn;
 
@@ -33,16 +33,20 @@ document.addEventListener("DOMContentLoaded", () => {
     bgMusic = document.getElementById("bgMusic");
     musicToggleBtn = document.getElementById("musicToggleBtn");
 
-    // Səhifə yüklənəndə 1-ci addımı göstər
     showStep("step1");
 
-    // Səs Düyməsi İdarəetməsi
+    /* --- AUDIO CONTROLLER (TOGGLE BUTTON) --- */
     if (musicToggleBtn && bgMusic) {
         musicToggleBtn.addEventListener("click", () => {
             if (bgMusic.paused) {
-                bgMusic.play().then(() => {
-                    musicToggleBtn.textContent = "🎵";
-                }).catch(err => console.log("Səs xətası:", err));
+                const playPromise = bgMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        musicToggleBtn.textContent = "🎵";
+                    }).catch(err => {
+                        console.log("Play failed:", err);
+                    });
+                }
             } else {
                 bgMusic.pause();
                 musicToggleBtn.textContent = "🔇";
@@ -50,18 +54,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Düymə Dinləyiciləri
+    /* --- EVENT LISTENERS FOR STEPS --- */
     if (nextNameBtn) {
         nextNameBtn.addEventListener("click", (e) => {
-            submitName(e);
-            playAudio();
+            if (submitName(e)) {
+                startMusic();
+            }
         });
     }
 
     if (yesBtn) {
         yesBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            playAudio();
+            startMusic();
             nextStep(3);
         });
     }
@@ -69,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (submitBtn) submitBtn.addEventListener("click", finishSelection);
     if (feedbackBtn) feedbackBtn.addEventListener("click", sendFeedback);
 
-    // Xeyr Düyməsinin Qaçma Sistemini Aktivləşdir
+    /* --- DODGE NO BUTTON --- */
     if (noBtn) {
         noBtn.addEventListener("pointerdown", dodgeNoButton, { passive: false });
         noBtn.addEventListener("mouseenter", dodgeNoButton);
@@ -77,15 +82,18 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* =========================================
-   AUDIO PLAYBACK FUNCTION
+   START MUSIC FUNCTION
 ========================================= */
-function playAudio() {
+function startMusic() {
     if (bgMusic && bgMusic.paused) {
-        bgMusic.play().then(() => {
-            if (musicToggleBtn) musicToggleBtn.textContent = "🎵";
-        }).catch(err => {
-            console.log("Audio avtomatik oxuna bilmədi:", err);
-        });
+        const playPromise = bgMusic.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                if (musicToggleBtn) musicToggleBtn.textContent = "🎵";
+            }).catch(err => {
+                console.log("Autoplay failed:", err);
+            });
+        }
     }
 }
 
@@ -110,14 +118,11 @@ function nextStep(stepNumber) {
 function submitName(event) {
     if (event) event.preventDefault();
 
-    const nameInput = document
-        .getElementById("userName")
-        .value
-        .trim();
+    const nameInput = document.getElementById("userName").value.trim();
 
     if (!nameInput) {
         alert("Zəhmət olmasa əvvəlcə adınızı daxil edin!");
-        return;
+        return false;
     }
 
     const askNameEl = document.getElementById("askName");
@@ -127,6 +132,7 @@ function submitName(event) {
     if (displayNameEl) displayNameEl.textContent = nameInput;
 
     nextStep(2);
+    return true;
 }
 
 /* =========================================
