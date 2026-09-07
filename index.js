@@ -6,7 +6,6 @@ const EMAILJS_SERVICE_ID = "service_ew9gjz1";
 const EMAILJS_TEMPLATE_ID = "template_g5kwrzq";
 const FEEDBACK_TEMPLATE_ID = "template_2emas1m";
 
-/* Sizə aid e-poçt ünvanı */
 const TARGET_EMAIL = "orxnquluzada@gmail.com";
 
 /* =========================================
@@ -21,7 +20,7 @@ const TARGET_EMAIL = "orxnquluzada@gmail.com";
 })();
 
 /* =========================================
-   DOM ELEMENTS
+   DOM ELEMENTS & AUDIO SETUP
 ========================================= */
 const nextNameBtn = document.getElementById("nextNameBtn");
 const yesBtn = document.getElementById("yesBtn");
@@ -32,7 +31,7 @@ const bgMusic = document.getElementById("bgMusic");
 const musicToggleBtn = document.getElementById("musicToggleBtn");
 
 /* =========================================
-   ROUTING ON INITIAL LOAD (DIRECT TO STEP 1)
+   ROUTING ON INITIAL LOAD
 ========================================= */
 window.addEventListener("DOMContentLoaded", () => {
     showStep("step1");
@@ -41,11 +40,17 @@ window.addEventListener("DOMContentLoaded", () => {
 /* =========================================
    EVENT LISTENERS
 ========================================= */
-if (nextNameBtn) nextNameBtn.addEventListener("click", submitName);
+if (nextNameBtn) {
+    nextNameBtn.addEventListener("click", (e) => {
+        submitName(e);
+        playAudio();
+    });
+}
 
 if (yesBtn) {
     yesBtn.addEventListener("click", (e) => {
         e.preventDefault();
+        playAudio();
         nextStep(3);
     });
 }
@@ -54,8 +59,18 @@ if (submitBtn) submitBtn.addEventListener("click", finishSelection);
 if (feedbackBtn) feedbackBtn.addEventListener("click", sendFeedback);
 
 /* =========================================
-   BACKGROUND MUSIC CONTROLLER
+   AUDIO PLAYBACK FUNCTION
 ========================================= */
+function playAudio() {
+    if (bgMusic && bgMusic.paused) {
+        bgMusic.play().then(() => {
+            if (musicToggleBtn) musicToggleBtn.textContent = "🎵";
+        }).catch(err => {
+            console.log("Audio play error:", err);
+        });
+    }
+}
+
 if (musicToggleBtn && bgMusic) {
     musicToggleBtn.addEventListener("click", () => {
         if (bgMusic.paused) {
@@ -84,7 +99,7 @@ function nextStep(stepNumber) {
 }
 
 /* =========================================
-   STEP 1: NAME VALIDATION & AUDIO TRIGGER
+   STEP 1: NAME VALIDATION
 ========================================= */
 function submitName(event) {
     if (event) event.preventDefault();
@@ -97,11 +112,6 @@ function submitName(event) {
     if (!nameInput) {
         alert("Zəhmət olmasa əvvəlcə adınızı daxil edin!");
         return;
-    }
-
-    /* Trigger Audio on First User Interaction */
-    if (bgMusic && bgMusic.paused) {
-        bgMusic.play().catch(err => console.log("Audio play blocked/failed:", err));
     }
 
     const askNameEl = document.getElementById("askName");
@@ -236,7 +246,7 @@ async function finishSelection(event) {
     const customActivity = document.getElementById("customActivity").value.trim();
 
     if (!date) {
-        alert("Zəhmət olmasa tarixi seçin!");
+        alert("Zəhmət olmasa tarihi seçin!");
         return;
     }
 
